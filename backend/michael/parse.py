@@ -53,17 +53,24 @@ def parse_property(url: str) -> dict:
                         data["bed"], data["bath"] = parse_bed_bath(text_data)
                     elif text == "address":
                         data["zip"] = text_data[-5:]
+                    elif text == "compensation comments":
+                        i += 2
+                        continue
                     elif text == "annual taxes:":
-                        data["annual taxes"] = get_number(text_data[:-7])
+                        if len(text_data) > 0:
+                            data["annual taxes"] = get_number(re.sub(r'\([^)]*\)', '', text_data))
                     elif text == "amenities":
                         data["amenities"] = len(text_data.split(","))
                     elif text == "schools":
                         data["schools"] = count_schools(text_data)
                     else:
                         if any(c.isdigit() for c in text_data):
-                            text_data = get_number(text_data)
+                            try:
+                                text_data = get_number(text_data)
+                            except ValueError:
+                                pass
                         data[text] = text_data
-                    i += 1
+                    i += 2
 
         return data
 

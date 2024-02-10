@@ -3,6 +3,8 @@ import requests as re
 from bs4 import BeautifulSoup as BS
 import regex
 import parse
+import locale
+from tqdm import tqdm
 
 
 def get_url(url:str, data: dict):
@@ -16,6 +18,12 @@ def get_url(url:str, data: dict):
             continue
         out += f"{key}={item}&"
     return out + "start=1"
+
+
+def format_number(number):
+    locale.setlocale(locale.LC_ALL, '')
+    formatted_number = locale.format_string("%d", number, grouping=True)
+    return formatted_number
 
 
 def query(url: str, features=None, **kwargs):
@@ -32,7 +40,7 @@ def query(url: str, features=None, **kwargs):
         'styp': 'sale',
         'sid': 0,
         'city': 'Atlanta',
-        'cnty': 'Fulton',
+        'cnty': '',
         'zip': '',
         'subd': '',
         'sch': '',
@@ -40,14 +48,14 @@ def query(url: str, features=None, **kwargs):
         'baf': 0,  # any count
         'lpl': '10,000',
         'lph': '1,000,000',
-        'sqftl': 10,
-        'sqfth': 1000,
-        'acresL': 0,
-        'arcesH': 10,
-        'ybl': 1990,
-        'ybh': 2024,
-        'typ': ['sd', 'sa', 'mf'],
-        'orderBy': 'a',
+        'sqftl': '',
+        'sqfth': '',
+        'acresL': '',
+        'arcesH': '',
+        'ybl': '',
+        'ybh': '',
+        'typ': ['sd', 'sa', 'mf'],  # single family home, condos & townhomes, multifamily
+        'orderBy': 'a',  # low to high
         'dbk': 0,
         'scat': 1,  # only available listings
         'submit': 'Search',
@@ -60,29 +68,36 @@ def query(url: str, features=None, **kwargs):
     for key, value in opt_data.items():
         if value == 1:
             data[key] = value
-    for key, arg in kwargs.values():
+    for key, arg in kwargs.items():
+        if key == 'lpl' or key == 'lph':
+            arg = format_number(arg)
         data[key] = arg
     base_info_url = "https://www.georgiamls.com/real-estate/search-detail.cfm?ln="
 
     u = get_url(url, data)
     r = re.get(url=u)
     soup = BS(r.content, 'html.parser')
-    count = soup.find("div", {"class": "listing-pagination-count"}).get_text(strip=True)
-    count = int(count[:count.index(" ")])
+    try:
+        count = soup.find("div", {"class": "listing-pagination-count"}).get_text(strip=True)
+        count = int(count[:count.index(" ")])
+    except AttributeError:
+        # something goes wrong so send empty dataframe to not ruin anything
+        return pd.DataFrame()
 
-    i = 1
-    while i < count:
+    for i in tqdm(range(1, count, 12)):
         u = u[0:u.rfind("=") + 1] + str(i)
         r = re.get(url=u)
         soup = BS(r.content, 'html.parser')
         listings = soup.find_all("div", {"class": 'listing-gallery'})
         for j, listing in enumerate(listings):
             text = listing.get_text(strip=True).lower()
+            search = regex.search(r'(?<=\s)\d{8}(?=\s*[a-zA-Z])', text)
+            if not search:
+                continue
             mls = regex.search(r'(?<=\s)\d{8}(?=\s*[a-zA-Z])', text).group(0)
             d = parse.parse_property(base_info_url + str(mls))
             filtered_d = {key: value for key, value in d.items() if key in col_set}
             df.loc[j + i - 1] = filtered_d
-        i += 12
 
     return df
 
