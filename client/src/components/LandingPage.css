@@ -1,0 +1,87 @@
+  .landing-page {
+    height: 100vh; /* Ensure the landing page occupies the entire screen height */
+    background-color: #f0f0f0; /* Example background color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px; /* Example font size */
+    background-image: linear-gradient(to bottom, #97f89e, #ffffff);
+  }
+
+  .heading {
+    display: flex; /* Add this line to make it a flex container */
+    align-items: center;
+    justify-content: center;
+    font-size: 55px;
+    color: #1f322c
+  }
+
+  .sub-heading {
+    display: flex; /* Add this line to make it a flex container */
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-top: -40px;
+    color: #357e60
+  }
+  
+  
+  /* LandingPage.css */
+
+.scroll-down {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .scroll-down a {
+    position: relative;
+    display: block;
+  }
+  
+  .scroll-down a span {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 30px;
+    height: 50px;
+    margin-left: -15px;
+    border: 2px solid #357e60;
+    border-radius: 50px;
+    box-sizing: border-box;
+  }
+  
+  .scroll-down a span::before {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    content: '';
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    background-color: #357e60;
+    border-radius: 100%;
+    animation: sdb10 2s infinite;
+    box-sizing: border-box;
+  }
+  
+  @keyframes sdb10 {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    40% {
+      opacity: 1;
+    }
+    80% {
+      transform: translate(0, 20px);
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  
