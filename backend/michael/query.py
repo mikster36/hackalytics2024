@@ -1,3 +1,4 @@
+import pandas as pd
 import requests as re
 from bs4 import BeautifulSoup as BS
 import regex
@@ -17,7 +18,15 @@ def get_url(url:str, data: dict):
     return out + "start=1"
 
 
-def main(url: str):
+def query(url: str, features=None, **kwargs):
+    if features:
+        col_set = set(features)
+        df = pd.DataFrame(columns=features)
+    else:
+        col_set = ('zip', 'county', 'bed', 'bath', 'sqft', 'lot size', 'year built', 'amenities', 'annual assoc. fee:',
+                   'annual taxes', 'schools', 'list price')
+        df = pd.DataFrame(columns=['zip', 'county', 'bed', 'bath', 'sqft', 'lot size', 'year built', 'amenities',
+                                   'annual taxes', 'annual assoc. fee:', 'schools', 'list price'])
     data = {
         'gtyp': 'loc',
         'styp': 'sale',
@@ -51,7 +60,8 @@ def main(url: str):
     for key, value in opt_data.items():
         if value == 1:
             data[key] = value
-
+    for key, arg in kwargs.values():
+        data[key] = arg
     base_info_url = "https://www.georgiamls.com/real-estate/search-detail.cfm?ln="
 
     u = get_url(url, data)
@@ -59,22 +69,23 @@ def main(url: str):
     soup = BS(r.content, 'html.parser')
     count = soup.find("div", {"class": "listing-pagination-count"}).get_text(strip=True)
     count = int(count[:count.index(" ")])
-    all = list()
 
     i = 1
-    while i < 12:
+    while i < count:
         u = u[0:u.rfind("=") + 1] + str(i)
         r = re.get(url=u)
         soup = BS(r.content, 'html.parser')
         listings = soup.find_all("div", {"class": 'listing-gallery'})
-        for listing in listings:
-            text = listing.get_text(strip=True)
+        for j, listing in enumerate(listings):
+            text = listing.get_text(strip=True).lower()
             mls = regex.search(r'(?<=\s)\d{8}(?=\s*[a-zA-Z])', text).group(0)
             d = parse.parse_property(base_info_url + str(mls))
-            all.append(d)
+            filtered_d = {key: value for key, value in d.items() if key in col_set}
+            df.loc[j + i - 1] = filtered_d
         i += 12
 
-    print(all[0])
+    return df
 
-if __name__=="__main__":
-    main("https://www.georgiamls.com/real-estate/search-action.cfm?")
+
+if __name__ == "__main__":
+    query("https://www.georgiamls.com/real-estate/search-action.cfm?")
