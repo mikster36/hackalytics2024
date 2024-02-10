@@ -31,9 +31,9 @@ def query(url: str, features=None, **kwargs):
         col_set = set(features)
         df = pd.DataFrame(columns=features)
     else:
-        col_set = ('zip', 'county', 'bed', 'bath', 'sqft', 'lot size', 'year built', 'amenities', 'annual assoc. fee:',
+        col_set = ('address', 'zip', 'county', 'bed', 'bath', 'sqft', 'lot size', 'year built', 'amenities', 'annual assoc. fee:',
                    'annual taxes', 'schools', 'list price')
-        df = pd.DataFrame(columns=['zip', 'county', 'bed', 'bath', 'sqft', 'lot size', 'year built', 'amenities',
+        df = pd.DataFrame(columns=['address', 'zip', 'county', 'bed', 'bath', 'sqft', 'lot size', 'year built', 'amenities',
                                    'annual taxes', 'annual assoc. fee:', 'schools', 'list price'])
     data = {
         'gtyp': 'loc',

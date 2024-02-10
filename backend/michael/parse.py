@@ -52,6 +52,7 @@ def parse_property(url: str) -> dict:
                     if text == "bed/bath":
                         data["bed"], data["bath"] = parse_bed_bath(text_data)
                     elif text == "address":
+                        data["address"] = text_data
                         data["zip"] = text_data[-5:]
                     elif text == "compensation comments":
                         i += 2

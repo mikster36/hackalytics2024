@@ -1,10 +1,11 @@
 import query
 import pandas as pd
+import requests
 import os
 
 def generate_dataset():
     csv_path = os.path.join(os.getcwd(), "data.csv")
-    data = pd.read_csv(csv_path)
+    data = pd.DataFrame() #pd.read_csv(csv_path)
     lpl = 0
     lph = 250000
     increment = 250000
@@ -21,18 +22,19 @@ def generate_dataset():
         lpl += increment
         lph += increment
 
-    data.to_csv(os.path.join(os.getcwd(), "data1.csv"))
+    data.to_csv(os.path.join(os.getcwd(), "data.csv"))
 
 
-def cleanup():
+def get_data():
     csv_path = os.path.join(os.getcwd(), "data.csv")
     df = pd.read_csv(csv_path)
-    df = df.iloc[:, 2:]  # drop whatever weird stuff was going on in the first two columns
+    df = df.iloc[:, 2:]  # first column is unnamed, second column is address
     df.dropna(subset=['bed', 'bath', 'sqft'], inplace=True)  # listings with bed/bath or sqft missing
-    df.drop(columns=['schools'], inplace=True)  # it's 2 for all listings so this isn't important
+    df.drop(columns=["schools", "lot_size"], inplace=True)  # schools = 2 for all, lot_size has little to no impact
     df = df.reset_index(drop=True)
-    df.to_csv(os.path.join(os.getcwd(), "data1.csv"))
+
     return df
 
+
 if __name__ == "__main__":
-    main()
+    pass
