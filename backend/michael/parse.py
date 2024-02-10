@@ -36,8 +36,6 @@ def parse_property(url: str) -> dict:
                         data[text] = row[i + 1].get_text(strip=True)
                     i += 1
 
-        data['text'] = soup.find(id="listing-remarks").get_text(strip=True)
-
         return data
 
 def main():
