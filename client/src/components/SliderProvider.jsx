@@ -5,6 +5,7 @@ const SliderContext = createContext();
 export const SliderProvider = ({ children }) => {
   const [sliderValue, setSliderValue] = useState(0);
   const [clickedPosition, setClickedPosition] = useState(null); // Add clicked position state
+  const [houses, setHouses] = useState([])
 
   const onSliderChange = (value) => {
     setSliderValue(value);
@@ -14,13 +15,19 @@ export const SliderProvider = ({ children }) => {
     setClickedPosition(position);
   };
 
+  const onCalculate = (values) => {
+    setHouses(values)
+  }
+
   return (
     <SliderContext.Provider
       value={{
         sliderValue,
         onSliderChange,
         clickedPosition, 
-        onMapClick
+        onMapClick,
+        houses,
+        onCalculate
       }}
     >
       {children}

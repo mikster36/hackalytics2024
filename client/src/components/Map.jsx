@@ -1,5 +1,5 @@
 //AIzaSyCzNRlt1SgsujvFDhEbiViRAG-glMzdXC8
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Circle, GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import './Map.css';
 import green_marker from '../resources/green_marker.png';
@@ -40,12 +40,11 @@ const mapOptions = {
 };
 
 function Map() {
-    const { clickedPosition, onMapClick } = useSlider(); 
     const [mapClicked, setMapClicked] = useState(false);
-    const { sliderValue } = useSlider();
+    const { sliderValue, clickedPosition, onMapClick, houses, onCalculate } = useSlider();
 
     const handleMapClick = (event) => {
-        if (true) {
+        if (!mapClicked) {
             const newPosition = {
                 lat: event.latLng.lat(),
                 lng: event.latLng.lng(),
@@ -56,6 +55,8 @@ function Map() {
         }
     };
 
+
+  console.log(houses)
     return (
         <div className='map-container'>
             <LoadScript
@@ -84,6 +85,12 @@ function Map() {
                             />
                         </>
                     )}
+                    (houses !== null && {houses.map((house, index) => (
+            <Marker
+              key={index}
+              position={{ lat: house.lat, lng: house.lng }}
+            />
+          ))})
                 </GoogleMap>
             </LoadScript>
         </div>
