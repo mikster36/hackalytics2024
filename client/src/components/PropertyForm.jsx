@@ -12,7 +12,7 @@ function PropertyForm() {
     min_year: '',
     location: '',
   });
-  const { sliderValue, onSliderChange, clickedPosition, setClickedPosition} = useSlider()
+  const { sliderValue, onSliderChange, clickedPosition, houses, onCalculate} = useSlider()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -45,7 +45,9 @@ function PropertyForm() {
         },
         body: JSON.stringify(postData)
       });
-  
+      const response_houses = await fetch('/fetch-data');
+      const data = await response_houses.json();
+        onCalculate(data);
       if (response.ok) {
         console.log('Property submitted successfully!');
       } else {
