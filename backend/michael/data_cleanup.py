@@ -1,11 +1,14 @@
 import query
 import pandas as pd
-import requests
 import os
+import requests
+from api import api_key as key
+import urllib.parse
+
 
 def generate_dataset():
     csv_path = os.path.join(os.getcwd(), "data.csv")
-    data = pd.DataFrame() #pd.read_csv(csv_path)
+    data = pd.DataFrame()  #pd.read_csv(csv_path)
     lpl = 0
     lph = 250000
     increment = 250000
@@ -25,6 +28,17 @@ def generate_dataset():
     data.to_csv(os.path.join(os.getcwd(), "data.csv"))
 
 
+def address_to_coords(s: str):
+    r = requests.get(
+        f"https://maps.googleapis.com/maps/api/geocode/json?address={urllib.parse.quote(s, safe='')}&key={key}")
+    try:
+        o = r.json()['results'][0]['geometry']['location']
+        lat, long = o['lat'], o['lng']
+        return lat, long
+    except Exception:
+        return None
+
+
 def get_data():
     csv_path = os.path.join(os.getcwd(), "data.csv")
     df = pd.read_csv(csv_path)
@@ -37,4 +51,4 @@ def get_data():
 
 
 if __name__ == "__main__":
-    pass
+    get_data()
